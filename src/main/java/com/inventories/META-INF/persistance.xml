@@ -4,6 +4,10 @@
     <persistence-unit name="persistenceUnit">
         <class>com.inventories.model.ProductEntity</class>
         <class>com.inventories.model.StockEntity</class>
+        <class>com.inventories.model.BrandEntity</class>
+        <class>com.inventories.model.BrandManufacturerEntity</class>
+        <class>com.inventories.model.GenericProductEntity</class>
+        <class>com.inventories.model.CategoryEntity</class>
         <properties>
             <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/inventories"/>
             <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>

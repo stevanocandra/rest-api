@@ -35,7 +35,7 @@ public class StockController {
      * @return
      */
     @RequestMapping(value = "/{code}", method = RequestMethod.PATCH)
-    public ResponseEntity<?> updateStockProduct(@PathVariable("code") String code, @RequestParam(value = "qty")Optional<Integer> qty){
+    public ResponseEntity<?> updateStockProduct(@PathVariable("code") String code, @RequestParam(value = "qty")Optional<String> qty){
         logger.info("Fetching Product with code {}", code);
         ProductEntity product = null;
         StockEntity stock = null;
@@ -45,7 +45,7 @@ public class StockController {
                 logger.info("Fetch qty : {}", qty);
                 stock = stockService.findByProductId(product.getId());
                 if (qty.isPresent()){
-                    stock = stockService.addQTY(stock, qty.get());
+                    stock = stockService.addQTY(stock, Integer.parseInt(qty.get()));
                 } else {
                     stock = stockService.addQTY(stock, 1);
                 }

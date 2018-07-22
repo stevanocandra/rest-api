@@ -2,9 +2,7 @@ package com.inventories.controller;
 
 
 import com.inventories.model.ProductEntity;
-import com.inventories.model.StockEntity;
 import com.inventories.service.ProductService;
-import com.inventories.service.StockService;
 import com.inventories.util.CustomErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +21,6 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
-
-    @Autowired
-    StockService stockService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> getProduct(@PathVariable("id") int id){
