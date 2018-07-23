@@ -27,7 +27,7 @@ public class BrandManufacturerController {
             brandManufacturer = brandManufacturerService.getAllBrandManufacturer();
         } catch (Exception e) {
             logger.error("An error occurred!");
-            return new ResponseEntity(new CustomErrorType("An error occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         return new ResponseEntity<Iterable>(brandManufacturer, HttpStatus.OK);
     }

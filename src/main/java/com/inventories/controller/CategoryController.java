@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -27,8 +28,21 @@ public class CategoryController {
             category = categoryService.getAllCategory();
         } catch (Exception e) {
             logger.error("An error occurred!");
-            return new ResponseEntity(new CustomErrorType("An error occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         return new ResponseEntity<Iterable>(category, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.POST, consumes = {"application/json", "application/soap+xml"})
+    public ResponseEntity<?> addCategory(@RequestBody CategoryEntity categoryEntity){
+        logger.info(("Process add new category"));
+        CategoryEntity category = null;
+        try {
+            category = categoryService.addCategory(categoryEntity);
+        } catch (Exception e) {
+            logger.error("An error occurred!");
+            CustomErrorType.returnResponsEntityError(e.getMessage());
+        }
+        return new ResponseEntity<CategoryEntity>(category, HttpStatus.OK);
     }
 }

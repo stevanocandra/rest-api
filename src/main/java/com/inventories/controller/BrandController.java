@@ -32,7 +32,7 @@ public class BrandController {
             brand = brandService.getAllByBrandName(page, size);
         } catch (Exception e){
             logger.error("An error occurred!");
-            return new ResponseEntity(new CustomErrorType("An error occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         return new ResponseEntity<Page>(brand, HttpStatus.OK);
     }
@@ -45,7 +45,7 @@ public class BrandController {
             brand = brandService.addBrand(brandEntity);
         } catch (Exception e){
             logger.error("An error occurred!");
-            return new ResponseEntity(new CustomErrorType("An error occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         return new ResponseEntity<BrandEntity>(brand, HttpStatus.OK);
     }

@@ -13,4 +13,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Iterable<CategoryEntity> getAllCategory(){
         return categoryRepo.findAll();
     }
+
+    public CategoryEntity addCategory(CategoryEntity category){
+        category.setId(categoryRepo.getNextSeriesId().intValue());
+        return categoryRepo.save(category);
+    }
 }

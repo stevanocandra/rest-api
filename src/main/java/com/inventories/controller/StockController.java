@@ -56,7 +56,7 @@ public class StockController {
             }
         } catch (Exception e) {
             logger.error("An error occurred!");
-            return new ResponseEntity(new CustomErrorType("An error occurred: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         return new ResponseEntity<StockEntity>(stock, HttpStatus.OK);
     }
