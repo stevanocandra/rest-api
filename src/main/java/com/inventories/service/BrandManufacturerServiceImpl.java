@@ -13,4 +13,9 @@ public class BrandManufacturerServiceImpl implements BrandManufacturerService {
     public Iterable<BrandManufacturerEntity> getAllBrandManufacturer(){
         return brandManufacturerRepo.findAll();
     }
+
+    public BrandManufacturerEntity addBrandManufacturer(BrandManufacturerEntity brandManufacturer) {
+        brandManufacturer.setId(brandManufacturerRepo.getNextSeriesId().intValue());
+        return brandManufacturerRepo.save(brandManufacturer);
+    }
 }

@@ -1,9 +1,9 @@
 package com.inventories.controller;
 
 import com.inventories.kafka.KafkaProducer;
-import com.inventories.model.CategoryEntity;
 import com.inventories.model.CustomMessage;
-import com.inventories.service.CategoryService;
+import com.inventories.model.ProductLotEntity;
+import com.inventories.service.ProductLotService;
 import com.inventories.util.CustomErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +12,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api/product/categories")
-public class CategoryController {
-    public static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+@RequestMapping("/api/product/lot")
+public class ProductLotController {
+    public static final Logger logger = LoggerFactory.getLogger(ProductLotController.class);
 
     @Autowired
-    CategoryService categoryService;
+    ProductLotService productLotService;
 
     @Autowired
     KafkaProducer kafkaProducer;
@@ -28,29 +31,29 @@ public class CategoryController {
     @Value("${spring.kafka.consumer.group-id}")
     String kafkaGroupId;
 
-    @Value("${inventories.kafka.post.category}")
-    String postCategoryTopic;
+    @Value("${inventories.kafka.post.product.lot}")
+    String postProductLot;
 
     @GetMapping(value = "")
-    public ResponseEntity<?> getAllCategory(){
-        Iterable<CategoryEntity> category = null;
-        try{
-            category = categoryService.getAllCategory();
+    public ResponseEntity<?> getAllProductLot(){
+        Iterable<ProductLotEntity> productLot = null;
+        try {
+            productLot = productLotService.getAllProductLotEntity();
         } catch (Exception e) {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
-        return new ResponseEntity<Iterable>(category, HttpStatus.OK);
+        return new ResponseEntity<Iterable>(productLot, HttpStatus.OK);
     }
 
     @PostMapping(value = "", consumes = {"application/json", "application/soap+xml"})
-    public ResponseEntity<?> addCategory(@RequestBody CategoryEntity categoryEntity){
-        logger.info(("Process add new category"));
+    public ResponseEntity<?> addProductLot(@RequestBody ProductLotEntity productLotEntity) {
+        logger.info(("Process add new product lot"));
         CustomMessage customMessage = new CustomMessage();
         try {
-            kafkaProducer.postCategory(postCategoryTopic, kafkaGroupId, categoryEntity);
+            kafkaProducer.postProductLot(postProductLot, kafkaGroupId, productLotEntity);
             customMessage.setStatusCode(HttpStatus.OK.value());
-            customMessage.setMessage("Created new category");
+            customMessage.setMessage("Created new product lot");
         } catch (Exception e) {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());

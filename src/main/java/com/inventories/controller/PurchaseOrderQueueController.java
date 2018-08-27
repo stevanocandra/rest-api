@@ -1,26 +1,27 @@
 package com.inventories.controller;
 
 import com.inventories.kafka.KafkaProducer;
-import com.inventories.model.CategoryEntity;
 import com.inventories.model.CustomMessage;
-import com.inventories.service.CategoryService;
+import com.inventories.model.PoQueueEntity;
+import com.inventories.service.PurchaseOrderQueueService;
 import com.inventories.util.CustomErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/api/product/categories")
-public class CategoryController {
-    public static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+@RequestMapping(value = "/api/purchase/order/queue")
+public class PurchaseOrderQueueController {
+    public static final Logger logger = LoggerFactory.getLogger(PurchaseOrderQueueController.class);
 
     @Autowired
-    CategoryService categoryService;
+    PurchaseOrderQueueService purchaseOrderQueueService;
 
     @Autowired
     KafkaProducer kafkaProducer;
@@ -28,29 +29,30 @@ public class CategoryController {
     @Value("${spring.kafka.consumer.group-id}")
     String kafkaGroupId;
 
-    @Value("${inventories.kafka.post.category}")
-    String postCategoryTopic;
+    @Value("${inventories.kafka.post.purchase.order.queue}")
+    String postPurchaseOrderQueueTopic;
 
-    @GetMapping(value = "")
-    public ResponseEntity<?> getAllCategory(){
-        Iterable<CategoryEntity> category = null;
-        try{
-            category = categoryService.getAllCategory();
-        } catch (Exception e) {
+    @GetMapping(value = "{page}/{size}")
+    public ResponseEntity<?> getAllQueue(@PathVariable("page") int page, @PathVariable("size") int size){
+        logger.info("Fetching all purchase order queue");
+        Page<PoQueueEntity> poQ = null;
+        try {
+            poQ = purchaseOrderQueueService.findAll(page, size);
+        } catch (Exception e){
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
-        return new ResponseEntity<Iterable>(category, HttpStatus.OK);
+        return new ResponseEntity<Page>(poQ, HttpStatus.OK);
     }
 
     @PostMapping(value = "", consumes = {"application/json", "application/soap+xml"})
-    public ResponseEntity<?> addCategory(@RequestBody CategoryEntity categoryEntity){
-        logger.info(("Process add new category"));
+    public ResponseEntity<?> addQueue(@RequestBody PoQueueEntity poQueueEntity){
+        logger.info("Process n ew Purchase Order Queue");
         CustomMessage customMessage = new CustomMessage();
         try {
-            kafkaProducer.postCategory(postCategoryTopic, kafkaGroupId, categoryEntity);
+            kafkaProducer.postPurchaseOrderQueue(postPurchaseOrderQueueTopic, kafkaGroupId, poQueueEntity);
             customMessage.setStatusCode(HttpStatus.OK.value());
-            customMessage.setMessage("Created new category");
+            customMessage.setMessage("Created new purchase order queue");
         } catch (Exception e) {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());

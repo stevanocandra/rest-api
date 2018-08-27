@@ -14,8 +14,8 @@ public class StockServiceImpl implements StockService {
     @Autowired
     StockRepo stockRepo;
 
-    public StockEntity findByProductId(int id) {
-        return stockRepo.findStockEntitiesByProductId(id);
+    public StockEntity findByProductCode(String productCode) {
+        return stockRepo.findStockEntitiesByProductCode(productCode);
     }
 
     public StockEntity addQTY(StockEntity stockEntity, int count){

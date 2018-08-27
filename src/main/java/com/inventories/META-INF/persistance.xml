@@ -8,6 +8,8 @@
         <class>com.inventories.model.BrandManufacturerEntity</class>
         <class>com.inventories.model.GenericProductEntity</class>
         <class>com.inventories.model.CategoryEntity</class>
+        <class>com.inventories.model.ProductLotEntity</class>
+        <class>com.inventories.model.ProductPriceRecordsEntity</class>
         <properties>
             <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/inventories"/>
             <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>

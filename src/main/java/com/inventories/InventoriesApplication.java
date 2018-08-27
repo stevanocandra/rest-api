@@ -1,34 +1,33 @@
 package com.inventories;
 
+import io.sentry.Sentry;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import javax.servlet.Filter;
 
-@ComponentScan(basePackages = "com.inventories")
 @SpringBootApplication
+//@ComponentScan(basePackages = "com.inventories")
 public class InventoriesApplication {
 
+    private static SentryClient sentry;
+
     public static void main(String[] args) {
+        Sentry.init("https://9ffe2965c3034768a1c6e6524d2f1c70@sentry.io/1254226");
+        sentry = SentryClientFactory.sentryClient();
+
         SpringApplication.run(InventoriesApplication.class, args);
     }
 
+    //To Support Cache API
     @Bean
-    public Filter shallowEtagHeaderFilter() {
-        return new ShallowEtagHeaderFilter();
+    public Filter filter(){
+        ShallowEtagHeaderFilter filter=new ShallowEtagHeaderFilter();
+        return filter;
     }
-
-    @Bean
-    public FilterRegistrationBean shallowEtagHeaderFilterRegistration() {
-        FilterRegistrationBean result = new FilterRegistrationBean();
-        result.setFilter(this.shallowEtagHeaderFilter());
-        result.addUrlPatterns("/api/*");
-        result.setName("shallowEtagHeaderFilter");
-        result.setOrder(1);
-        return result;
-    }
+    //End Support Cache API
 }

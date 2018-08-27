@@ -13,4 +13,9 @@ public class GenericProductServiceImpl implements GenericProductService {
     public Iterable<GenericProductEntity> getAllGenericProduct(){
         return genericProductRepo.findAll();
     }
+
+    public GenericProductEntity addGenericProduct(GenericProductEntity genericProductEntity) {
+        genericProductEntity.setId(genericProductRepo.getNextSeriesId().intValue());
+        return genericProductRepo.save(genericProductEntity);
+    }
 }

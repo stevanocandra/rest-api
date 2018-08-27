@@ -9,6 +9,9 @@ import java.util.Objects;
 public class ProductEntity {
     private int id;
     private String productCode;
+    private Integer categoryId;
+    private Integer brandId;
+    private Integer genericId;
     private String productName;
     private String productDescription;
     private BigDecimal productPrice;
@@ -36,6 +39,36 @@ public class ProductEntity {
 
     public void setProductCode(String productCode) {
         this.productCode = productCode;
+    }
+
+    @Basic
+    @Column(name = "category_id")
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    @Basic
+    @Column(name = "brand_id")
+    public Integer getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Integer brandId) {
+        this.brandId = brandId;
+    }
+
+    @Basic
+    @Column(name = "generic_id")
+    public Integer getGenericId() {
+        return genericId;
+    }
+
+    public void setGenericId(Integer genericId) {
+        this.genericId = genericId;
     }
 
     @Basic
@@ -125,6 +158,9 @@ public class ProductEntity {
         ProductEntity that = (ProductEntity) o;
         return id == that.id &&
                 Objects.equals(productCode, that.productCode) &&
+                Objects.equals(categoryId, that.categoryId) &&
+                Objects.equals(brandId, that.brandId) &&
+                Objects.equals(genericId, that.genericId) &&
                 Objects.equals(productName, that.productName) &&
                 Objects.equals(productDescription, that.productDescription) &&
                 Objects.equals(productPrice, that.productPrice) &&
@@ -138,6 +174,6 @@ public class ProductEntity {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, productCode, productName, productDescription, productPrice, hasLot, singleUnitProductCode, lotInformation, isActive, deleted);
+        return Objects.hash(id, productCode, categoryId, brandId, genericId, productName, productDescription, productPrice, hasLot, singleUnitProductCode, lotInformation, isActive, deleted);
     }
 }

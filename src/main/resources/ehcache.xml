@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache name="appCacheManager">
+
+    <defaultCache
+            maxEntriesLocalHeap="100"
+            eternal="false"
+            timeToLiveSeconds="1800"
+            overflowToDisk="false"
+            memoryStoreEvictionPolicy="LFU" />
+
+    <cache
+            name="httpClient"
+            maxElementsInMemory="10"
+            timeToLiveSeconds="86400"
+            eternal="false"
+            overflowToDisk="false" />
+
+</ehcache>

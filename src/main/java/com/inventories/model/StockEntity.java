@@ -7,7 +7,7 @@ import java.util.Objects;
 @Table(name = "stock", schema = "public", catalog = "inventories")
 public class StockEntity {
     private int id;
-    private Integer productId;
+    private String productCode;
     private Integer rackId;
     private Long quantityInHand;
 
@@ -22,11 +22,14 @@ public class StockEntity {
     }
 
     @Basic
-    @JoinColumn(name = "product_id")
-    public Integer getProductId() { return productId; }
+    @JoinColumn(name = "product_code")
+    @Column(name = "product_code")
+    public String getProductCode() {
+        return productCode;
+    }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     @Basic
@@ -55,6 +58,7 @@ public class StockEntity {
         if (o == null || getClass() != o.getClass()) return false;
         StockEntity that = (StockEntity) o;
         return id == that.id &&
+                Objects.equals(productCode, that.productCode) &&
                 Objects.equals(rackId, that.rackId) &&
                 Objects.equals(quantityInHand, that.quantityInHand);
     }
@@ -62,6 +66,6 @@ public class StockEntity {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, rackId, quantityInHand);
+        return Objects.hash(id, productCode, rackId, quantityInHand);
     }
 }
