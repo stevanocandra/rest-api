@@ -69,7 +69,7 @@ public class BrandController {
         logger.info(("Process add new brand"));
         Resources<CustomMessage> res = null;
         try {
-            kafkaProducer.postBrand(postBrandTopic, kafkaGroupId, brandEntity);
+            brandService.addBrand(brandEntity);
             List<CustomMessage> customMessageList = ArrayListCustomMessage.setMessage("Created new brand", HttpStatus.OK);
             res = new Resources<>(customMessageList);
             res.add(linkTo(BrandController.class).withSelfRel());
@@ -86,7 +86,7 @@ public class BrandController {
         logger.info(("Process add new brand"));
         Resources<CustomMessage> res = null;
         try {
-            brandService.addBrand(brandEntity);
+            kafkaProducer.postBrand(postBrandTopic, kafkaGroupId, brandEntity);
             List<CustomMessage> customMessageList = ArrayListCustomMessage.setMessage("Created new brand layered", HttpStatus.OK);
             res = new Resources<>(customMessageList);
             res.add(linkTo(BrandController.class).withSelfRel());
