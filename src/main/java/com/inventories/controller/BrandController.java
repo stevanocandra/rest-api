@@ -21,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,6 +81,23 @@ public class BrandController {
         return new ResponseEntity<Resources>(res, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/layered", consumes = {"application/json", "application/soap+xml"})
+    public ResponseEntity<?> addLayeredBrand(@RequestBody BrandEntity brandEntity){
+        logger.info(("Process add new brand"));
+        Resources<CustomMessage> res = null;
+        try {
+            brandService.addBrand(brandEntity);
+            List<CustomMessage> customMessageList = ArrayListCustomMessage.setMessage("Created new brand layered", HttpStatus.OK);
+            res = new Resources<>(customMessageList);
+            res.add(linkTo(BrandController.class).withSelfRel());
+            res.add(linkTo(BrandManufacturerController.class).withRel("brand_manufacturer"));
+        } catch (Exception e){
+            logger.error("An error occurred! {}", e.getMessage());
+            CustomErrorType.returnResponsEntityError(e.getMessage());
+        }
+        return new ResponseEntity<Resources>(res, HttpStatus.OK);
+    }
+
     @PutMapping(value = "/{id}", consumes = {"application/json", "application/soap+xml"})
     public ResponseEntity<?> putBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
         logger.info("Process put brand");
@@ -110,34 +125,6 @@ public class BrandController {
         return new ResponseEntity<Resources>(res, HttpStatus.OK);
     }
 
-    @PatchMapping(value = "/layered/{id}", consumes = {"application/json", "application/soap+xml"})
-    public ResponseEntity<?> updateLayeredBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
-        logger.info("Process patch brand");
-        Resources<CustomMessage> res = null;
-        try {
-            List<CustomMessage> customMessageList = null;
-            BrandEntity brand = brandService.findById(id);
-            if (brand != null) {
-                customMessageList = ArrayListCustomMessage.setMessage("Patch brand process", HttpStatus.OK);
-                brandEntity.setId(id);
-                brandEntity.setBrandCode(brand.getBrandCode());
-                kafkaProducer.postBrand(patchBrandTopic, kafkaGroupId, brandEntity);
-            } else {
-                customMessageList = ArrayListCustomMessage.setMessage("Brand Id" + id + " Not Found!", HttpStatus.BAD_REQUEST);
-                res = new Resources<>(customMessageList);
-                res.add(linkTo(BrandController.class).withSelfRel());
-                return new ResponseEntity<Resources>(res, HttpStatus.BAD_REQUEST);
-            }
-            res = new Resources<>(customMessageList);
-            res.add(linkTo(BrandController.class).slash(id).withSelfRel());
-            res.add(linkTo(BrandManufacturerController.class).withRel("brand_manufacturer"));
-        } catch (Exception e) {
-            logger.error("An error occurred! {}", e.getMessage());
-            CustomErrorType.returnResponsEntityError(e.getMessage());
-        }
-        return new ResponseEntity<Resources>(res, HttpStatus.OK);
-    }
-
     @PatchMapping(value = "/{id}", consumes = {"application/json", "application/soap+xml"})
     public ResponseEntity<?> updateBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
         logger.info("Process patch brand");
@@ -149,7 +136,7 @@ public class BrandController {
                 customMessageList = ArrayListCustomMessage.setMessage("Patch brand process", HttpStatus.OK);
                 brandEntity.setId(id);
                 brandEntity.setBrandCode(brand.getBrandCode());
-                brandService.updateBrand(brandEntity);
+                kafkaProducer.postBrand(patchBrandTopic, kafkaGroupId, brandEntity);
             } else {
                 customMessageList = ArrayListCustomMessage.setMessage("Brand Id" + id + " Not Found!", HttpStatus.BAD_REQUEST);
                 res = new Resources<>(customMessageList);
