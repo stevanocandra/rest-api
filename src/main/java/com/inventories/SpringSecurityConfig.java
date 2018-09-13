@@ -35,6 +35,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().httpBasic()
                 .authenticationEntryPoint(authEntryPoint);
         http.headers().cacheControl().disable(); //Spring Security invalidated it in the response, must use this line to disable default cache control from Spring Security
+        http.logout().logoutUrl("/api/logout").invalidateHttpSession(true);
     }
 
     @Autowired
