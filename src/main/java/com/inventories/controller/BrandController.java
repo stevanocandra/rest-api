@@ -18,9 +18,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.Media;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,7 +67,7 @@ public class BrandController {
         return new ResponseEntity<PagedResources>(pagedResources, headers, HttpStatus.OK);
     }
 
-    @PostMapping(value = "", consumes = {"application/json", "application/soap+xml"})
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> addBrand(@RequestBody BrandEntity brandEntity){
         logger.info(("Process add new brand"));
         Resources<CustomMessage> res = null;
@@ -78,10 +81,10 @@ public class BrandController {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
-        return new ResponseEntity<Resources>(res, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/layered", consumes = {"application/json", "application/soap+xml"})
+    @PostMapping(value = "/layered", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> addLayeredBrand(@RequestBody BrandEntity brandEntity){
         logger.info(("Process add new brand"));
         Resources<CustomMessage> res = null;
@@ -95,25 +98,25 @@ public class BrandController {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
-        return new ResponseEntity<Resources>(res, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}", consumes = {"application/json", "application/soap+xml"})
-    public ResponseEntity<?> putBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
-        logger.info("Process put brand");
+    private ResponseEntity<Resources> putAndPatch(BrandEntity brandEntity, int id, int mode){
+        logger.info("Process '{}' brand", (mode == 0 ? "put" : "patch"));
         Resources<CustomMessage> res = null;
         try {
             List<CustomMessage> customMessageList = null;
             BrandEntity brand = brandService.findById(id);
             if (brand != null) {
-                customMessageList = ArrayListCustomMessage.setMessage("Put brand process", HttpStatus.OK);
+                customMessageList = ArrayListCustomMessage.setMessage((mode == 0 ? "Put" : "Patch" ) + " brand process", HttpStatus.OK);
                 brandEntity.setId(id);
-                kafkaProducer.postBrand(putBrandTopic, kafkaGroupId, brandEntity);
+                if (mode != 0) brandEntity.setBrandCode(brand.getBrandCode());
+                kafkaProducer.postBrand((mode == 0 ? putBrandTopic : patchBrandTopic), kafkaGroupId, brandEntity);
             } else {
                 customMessageList = ArrayListCustomMessage.setMessage("Brand Id" + id + " Not Found!", HttpStatus.BAD_REQUEST);
                 res = new Resources<>(customMessageList);
                 res.add(linkTo(BrandController.class).withSelfRel());
-                return new ResponseEntity<Resources>(res, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
             }
             res = new Resources<>(customMessageList);
             res.add(linkTo(BrandController.class).slash(id).withSelfRel());
@@ -122,34 +125,16 @@ public class BrandController {
             logger.error("An error occurred! {}", e.getMessage());
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
-        return new ResponseEntity<Resources>(res, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> putBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
+        return putAndPatch(brandEntity, id, 0);
     }
 
     @PatchMapping(value = "/{id}", consumes = {"application/json", "application/soap+xml"})
     public ResponseEntity<?> updateBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
-        logger.info("Process patch brand");
-        Resources<CustomMessage> res = null;
-        try {
-            List<CustomMessage> customMessageList = null;
-            BrandEntity brand = brandService.findById(id);
-            if (brand != null) {
-                customMessageList = ArrayListCustomMessage.setMessage("Patch brand process", HttpStatus.OK);
-                brandEntity.setId(id);
-                brandEntity.setBrandCode(brand.getBrandCode());
-                kafkaProducer.postBrand(patchBrandTopic, kafkaGroupId, brandEntity);
-            } else {
-                customMessageList = ArrayListCustomMessage.setMessage("Brand Id" + id + " Not Found!", HttpStatus.BAD_REQUEST);
-                res = new Resources<>(customMessageList);
-                res.add(linkTo(BrandController.class).withSelfRel());
-                return new ResponseEntity<Resources>(res, HttpStatus.BAD_REQUEST);
-            }
-            res = new Resources<>(customMessageList);
-            res.add(linkTo(BrandController.class).slash(id).withSelfRel());
-            res.add(linkTo(BrandManufacturerController.class).withRel("brand_manufacturer"));
-        } catch (Exception e) {
-            logger.error("An error occurred! {}", e.getMessage());
-            CustomErrorType.returnResponsEntityError(e.getMessage());
-        }
-        return new ResponseEntity<Resources>(res, HttpStatus.OK);
+        return putAndPatch(brandEntity, id, 1);
     }
 }
