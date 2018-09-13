@@ -17,12 +17,21 @@ public class BrandServiceImpl implements BrandService {
         return brandRepo.findAllByBrandNameIsLike(name);
     }
 
-    public Page<BrandEntity> getAllByBrandName(int page, int size){
-        return brandRepo.findAll(new PageRequest(page, size, Sort.Direction.ASC, "brandName"));
+    public Page<BrandEntity> getAllByBrandName(int page, int size, String sort){
+        String[] sortSplit = sort.split(",");
+        return brandRepo.findAll(new PageRequest(page, size, (sortSplit[1].toUpperCase().equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC), sortSplit[0]));
+    }
+
+    public BrandEntity findById(int id){
+        return brandRepo.findById(id);
     }
 
     public BrandEntity addBrand(BrandEntity brand) {
         brand.setId(brandRepo.getNextSeriesId().intValue());
+        return brandRepo.save(brand);
+    }
+
+    public BrandEntity updateBrand(BrandEntity brand) {
         return brandRepo.save(brand);
     }
 }

@@ -1,5 +1,4 @@
 package com.inventories.model;
-
 import javax.persistence.*;
 import java.util.Objects;
 

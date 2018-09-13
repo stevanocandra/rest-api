@@ -1,9 +1,12 @@
 package com.inventories.model;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@RestResource
 @Table(name = "brand_manufacturer", schema = "public", catalog = "inventories")
 public class BrandManufacturerEntity {
     private int id;
