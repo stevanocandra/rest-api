@@ -3,7 +3,7 @@ package com.inventories.controller;
 import com.inventories.kafka.KafkaProducer;
 import com.inventories.model.BrandEntity;
 import com.inventories.util.ArrayListCustomMessage;
-import com.inventories.util.MultiResource;
+import com.inventories.resource.MultiResource;
 import com.inventories.model.CustomMessage;
 import com.inventories.service.BrandService;
 import com.inventories.util.CustomErrorType;
@@ -22,8 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import javax.print.attribute.standard.Media;
 import java.util.Arrays;
 import java.util.List;
 

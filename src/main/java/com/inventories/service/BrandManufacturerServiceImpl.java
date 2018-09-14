@@ -3,14 +3,14 @@ package com.inventories.service;
 import com.inventories.model.BrandManufacturerEntity;
 import com.inventories.repo.BrandManufacturerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;;
+import org.springframework.stereotype.Service;;import java.util.List;
 
 @Service("BrandManufacturerService")
 public class BrandManufacturerServiceImpl implements BrandManufacturerService {
     @Autowired
     BrandManufacturerRepo brandManufacturerRepo;
 
-    public Iterable<BrandManufacturerEntity> getAllBrandManufacturer(){
+    public List<BrandManufacturerEntity> getAllBrandManufacturer(){
         return brandManufacturerRepo.findAll();
     }
 

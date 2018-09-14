@@ -30,12 +30,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/admin/*").hasRole("ADMIN")
+                .antMatchers("/api/**").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                 .anyRequest().authenticated()
                 .and().httpBasic()
                 .authenticationEntryPoint(authEntryPoint);
         http.headers().cacheControl().disable(); //Spring Security invalidated it in the response, must use this line to disable default cache control from Spring Security
-        http.logout().logoutUrl("/api/logout").invalidateHttpSession(true);
     }
 
     @Autowired
