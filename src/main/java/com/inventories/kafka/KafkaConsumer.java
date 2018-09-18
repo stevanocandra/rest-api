@@ -13,13 +13,15 @@ import javax.transaction.Transactional;
 @Component
 @Transactional
 public class KafkaConsumer {
-    public static final Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
 
     @Autowired
     BrandService brandService;
 
     @Autowired
     BrandManufacturerService brandManufacturerService;
+
+    private BrandEntity brandEntityFromKafka = new BrandEntity();
 
     @KafkaListener(topics = "4igc0qsg-inventories.kafka.post.brand", groupId = "inventories")
     public void processPostBrand(String brandJSON){
@@ -34,27 +36,32 @@ public class KafkaConsumer {
         }
     }
 
-//    @KafkaListener(topics = , groupId = "inventories")
-//    public void processPutBrand(String brandJSON){
-//        logger.info("received content = '{}'", brandJSON);
-//        try{
-//            ObjectMapper mapper = new ObjectMapper();
-//            BrandEntity brandEntity = mapper.readValue(brandJSON, BrandEntity.class);
-//            BrandEntity brand = brandService.updateBrand(brandEntity);
-//            logger.info("Success process brand '{}' with topic '{}'", brand.getBrandName(), "inventories.kafka.put.brand");
-//        } catch (Exception e){
-//            logger.error("An error occurred! '{}'", e.getMessage());
-//        }
-//    }
+    @KafkaListener(topics = "4igc0qsg-inventories.kafka.put.brand" , groupId = "inventories")
+    public void processPutBrand(String brandJSON){
+        logger.info("received content = '{}'", brandJSON);
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            BrandEntity brand = mapper.readValue(brandJSON, BrandEntity.class);
+            brandEntityFromKafka = brand;
+            logger.info("Success process brand '{}' with topic '{}'", brand.getBrandName(), "inventories.kafka.put.brand");
+        } catch (Exception e){
+            logger.error("An error occurred! '{}'", e.getMessage());
+        }
+    }
 
-    @KafkaListener(topics = {"4igc0qsg-inventories.kafka.put.brand", "4igc0qsg-inventories.kafka.patch.brand"}, groupId = "inventories")
+    public BrandEntity getBrandEntityFromKafka(){
+        return brandEntityFromKafka;
+    }
+
+
+    @KafkaListener(topics = "4igc0qsg-inventories.kafka.patch.brand", groupId = "inventories")
     public void processPatchBrand(String brandJSON){
         logger.info("received content = '{}'", brandJSON);
         try{
             ObjectMapper mapper = new ObjectMapper();
             BrandEntity brandEntity = mapper.readValue(brandJSON, BrandEntity.class);
             BrandEntity brand = brandService.updateBrand(brandEntity);
-            logger.info("Success process brand '{}' with topic '{}'", brand.getBrandName(), "inventories.kafka.patch.brand/inventories.kafka.put.brand");
+            logger.info("Success process brand '{}' with topic '{}'", brand.getBrandName(), "inventories.kafka.patch.brand");
         } catch (Exception e){
             logger.error("An error occurred! '{}'", e.getMessage());
         }

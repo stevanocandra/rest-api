@@ -1,5 +1,6 @@
 package com.inventories.controller;
 
+import com.inventories.kafka.KafkaConsumer;
 import com.inventories.kafka.KafkaProducer;
 import com.inventories.model.BrandEntity;
 import com.inventories.util.ArrayListCustomMessage;
@@ -36,6 +37,9 @@ public class BrandController {
     @Autowired
     KafkaProducer kafkaProducer;
 
+    @Autowired
+    KafkaConsumer kafkaConsumer;
+
     @Value("${spring.kafka.consumer.group-id}")
     String kafkaGroupId;
 
@@ -63,6 +67,20 @@ public class BrandController {
         headers.put(HttpHeaders.USER_AGENT, Arrays.asList(userAgent));
         PagedResources<MultiResource> pagedResources = pagedResourcesAssembler.toResource(brand);
         return new ResponseEntity<PagedResources>(pagedResources, headers, HttpStatus.OK);
+    }
+
+    @GetMapping(value="/{id}")
+    public ResponseEntity<?> getBrandById(@PathVariable("id") int id){
+        logger.info("Fetching brand with ID {}", id);
+        BrandEntity brand = null;
+        try{
+            brand = kafkaConsumer.getBrandEntityFromKafka();
+            if (brand.getId() == 0) brand = brandService.findById(id);
+        } catch (Exception e){
+            logger.error("An error occurred! {}", e.getMessage());
+            CustomErrorType.returnResponsEntityError(e.getMessage());
+        }
+        return new ResponseEntity<BrandEntity>(brand, HttpStatus.OK);
     }
 
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})

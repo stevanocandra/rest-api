@@ -2,11 +2,15 @@ package com.inventories.service;
 
 import com.inventories.model.BrandEntity;
 import com.inventories.repo.BrandRepo;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @Service("BrandService")
 public class BrandServiceImpl implements BrandService {
@@ -26,11 +30,13 @@ public class BrandServiceImpl implements BrandService {
         return brandRepo.findById(id);
     }
 
+    @Transactional
     public BrandEntity addBrand(BrandEntity brand) {
         brand.setId(brandRepo.getNextSeriesId().intValue());
         return brandRepo.save(brand);
     }
 
+    @Transactional
     public BrandEntity updateBrand(BrandEntity brand) {
         return brandRepo.save(brand);
     }
