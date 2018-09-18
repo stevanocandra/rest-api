@@ -50,7 +50,7 @@ public class BrandController {
 
 
     @GetMapping(value="")
-    public ResponseEntity<?> getAllByBrandName(@RequestParam("page") int page, @RequestParam("size") int size, @RequestParam(value = "sort", defaultValue = "brandName,asc") String sort, PagedResourcesAssembler pagedResourcesAssembler){
+    public ResponseEntity<?> getAllByBrandName(@RequestParam("page") int page, @RequestParam("size") int size, @RequestParam(value = "sort", defaultValue = "brandName,asc") String sort, PagedResourcesAssembler pagedResourcesAssembler, @RequestHeader("User-Agent") String userAgent){
         logger.info("Fetching all brands");
         Page<BrandEntity> brand = null;
         try {
@@ -60,7 +60,7 @@ public class BrandController {
             CustomErrorType.returnResponsEntityError(e.getMessage());
         }
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.put("Cache-Control", Arrays.asList("max-age=5"));
+        headers.put(HttpHeaders.USER_AGENT, Arrays.asList(userAgent));
         PagedResources<MultiResource> pagedResources = pagedResourcesAssembler.toResource(brand);
         return new ResponseEntity<PagedResources>(pagedResources, headers, HttpStatus.OK);
     }
