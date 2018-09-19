@@ -25,13 +25,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return env.getProperty(param);
     }
 
-    PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    private PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/api/**").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
                 .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/slide/**").access("hasRole('ROLE_SLIDE')")
                 .anyRequest().authenticated()
                 .and().httpBasic()
                 .authenticationEntryPoint(authEntryPoint);
@@ -47,6 +48,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
             .withUser(readProperty("useradmin"))
             .password(encoder.encode(readProperty("adminpass")))
-            .roles("ADMIN");
+            .roles("ADMIN")
+        .and()
+            .withUser(readProperty("userslide"))
+            .password(encoder.encode(readProperty("slidepass")))
+            .roles("SLIDE");
     }
 }
