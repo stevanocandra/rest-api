@@ -74,7 +74,7 @@ public class BrandController {
         logger.info("Fetching brand with ID {}", id);
         BrandEntity brand = null;
         try{
-            brand = kafkaConsumer.getBrandEntityFromKafka();
+            brand = kafkaConsumer.getBrandEntityFromKafka(id);
             if (brand.getId() == 0) brand = brandService.findById(id);
         } catch (Exception e){
             logger.error("An error occurred! {}", e.getMessage());
@@ -149,7 +149,7 @@ public class BrandController {
         return putAndPatch(brandEntity, id, 0);
     }
 
-    @PatchMapping(value = "/{id}", consumes = {"application/json", "application/soap+xml"})
+    @PatchMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateBrand(@PathVariable("id") int id, @RequestBody BrandEntity brandEntity){
         return putAndPatch(brandEntity, id, 1);
     }

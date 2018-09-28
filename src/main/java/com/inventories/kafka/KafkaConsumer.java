@@ -49,7 +49,7 @@ public class KafkaConsumer {
         }
     }
 
-    public BrandEntity getBrandEntityFromKafka(){
+    public BrandEntity getBrandEntityFromKafka(int id){
         return brandEntityFromKafka;
     }
 
